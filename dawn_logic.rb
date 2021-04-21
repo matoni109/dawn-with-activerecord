@@ -3,7 +3,7 @@ require 'csv'
 # require "pry-byebug"
 
 def dawn_csv(filepath)
-  puts "looking for products :)"
+  puts 'looking for products :)'
   CSV.foreach(filepath) do |row|
     product = Product.new(
       code: find_code(row),
@@ -42,21 +42,22 @@ def dawn_csv(filepath)
   end
 end
 
-peak = "638306 PEK8 4G 2TUFR 2HDF JC 0.8 BLK"
+peak = '638306 PEK8 4G 2TUFR 2HDF JC 0.8 BLK'
 
 ### find the colour ###
-def find_colour(product) ## TODO: add silver ano
+## TODO: add silver ano
+def find_colour(product)
   # binding.pry
   if product.white == true
-    return "white"
+    'white'
   elsif product.black == true
-    return "black"
+    'black'
   elsif product.red == true
-    return "red"
+    'red'
   elsif product.grey == true
-    return "grey"
+    'grey'
   else
-    return product.custom_col.join
+    product.custom_col.join
   end
 end
 
@@ -76,32 +77,35 @@ def find_models(csv_row)
 
   ## Find if it is the only model found
   if model.uniq.length > 2
-    return model = "UnKnown"
+    model = 'UnKnown'
   else
     # binding.pry
-    return model.join
+    model.join
   end
 end
 
 ### Models List  ####
-def find_peak(csv_row) # Find PEAK
+# Find PEAK
+def find_peak(csv_row)
   # binding.pry
   model = csv_row.join.scan(/PEAK|PEK\d\b/)
   puts "I found #{model.join}"
   # attributes = { model: model }
-  model == "" ? nil : model.join
+  model == '' ? nil : model.join
 end
 
 ### Models End ####
 
 ### Description Start ####
 
-def short_description(csv_row) # Find PEAK
+# Find PEAK
+def short_description(csv_row)
   # binding.pry string.gsub!(/\d+/,"")
-  model = csv_row.join.gsub!(/\b\d{6}\b/,"").strip
+  model = csv_row.join.gsub!(/\b\d{6}\b/, '').strip
 end
 
-def long_description(csv_row, product) # Call with "row"
+# Call with "row"
+def long_description(csv_row, product)
   # binding.pry
   p model = find_models(csv_row)
   p colour = find_colour(product).capitalize
@@ -116,81 +120,72 @@ def long_description(csv_row, product) # Call with "row"
 
   # model in COL with GPOs || TUF & DATA & HDMI & Lead # 3PIN or J Coupler
 
-  long_description = "#{model} #{colour} with #{gpos} #{tuf} #{data} #{hdmi} #{lead} and #{j_coupler} #{three_pin} #{three_pin_to}".strip.gsub("  ", " ")
-
+  long_description = "#{model} #{colour} with #{gpos} #{tuf} #{data} #{hdmi} #{lead} and #{j_coupler} #{three_pin} #{three_pin_to}".strip.gsub(
+    '  ', ' '
+  )
 end
 
 ## Long Description START ##
 
 def l_desc_gpo_finder(csv_row)
-  ##TO DO: add UK EU CH logic
+  # #TO DO: add UK EU CH logic
   gpos = find_gpo(csv_row)
   gpos == 0 ? nil : "#{gpos} GPO"
 end
 
 def l_desc_lead_finder(csv_row)
-  #
   lead = find_lead_l(csv_row)
   lead == 0 ? nil : "#{lead}m Lead"
 end
 
 def l_desc_j_coupler_finder(csv_row)
-  #
   jc = find_jc(csv_row)
-  jc == true ? "J Coupler" : nil
+  jc == true ? 'J Coupler' : nil
 end
 
 def l_desc_3_pin_finder(csv_row)
-  #
   three_pin = find_3_pin(csv_row)
-  three_pin == true ? "3 Pin Plug" : nil
+  three_pin == true ? '3 Pin Plug' : nil
 end
 
 def l_desc_3_pin_to_finder(csv_row)
-  #
   three_pin = find_3_pin_to(csv_row)
-  three_pin == true ? "3 Pin Plug with Thermal Overload" : nil
+  three_pin == true ? '3 Pin Plug with Thermal Overload' : nil
 end
 
-def l_desc_tuf_finder(csv_row, product)
+def l_desc_tuf_finder(_csv_row, product)
   if product.tuf > 0
     tuf = product.tuf
-    return "#{tuf} TUF USB Charger"
+    "#{tuf} TUF USB Charger"
   elsif product.tuf_r > 0
     tuf = product.tuf_r
-    return "#{tuf} TUF-R USB Charger"
-  else
-    return nil
+    "#{tuf} TUF-R USB Charger"
   end
 end
 
-def l_desc_hdmi_finder(csv_row, product)
+def l_desc_hdmi_finder(_csv_row, product)
   if product.hdmi_cut > 0
     hdmi = product.hdmi_cut
-    return "#{hdmi} HDMI Cutouts"
+    "#{hdmi} HDMI Cutouts"
   elsif product.hdmi_f > 0
     hdmi = product.hdmi_f
-    return "#{hdmi} HDMI Flyleads"
+    "#{hdmi} HDMI Flyleads"
   elsif product.hdmi_coupler > 0
     hdmi = product.hdmi_coupler
-    return "#{hdmi} HDMI Couplers"
-  else
-    return nil
+    "#{hdmi} HDMI Couplers"
   end
 end
 
-def l_desc_data_finder(csv_row, product)
+def l_desc_data_finder(_csv_row, product)
   if product.data_cut > 0
     data = product.data_cut
-    return "#{data} DATA Cutouts"
+    "#{data} DATA Cutouts"
   elsif product.data_f > 0
     data = product.data_f
-    return "#{data} DATA Flyleads"
+    "#{data} DATA Flyleads"
   elsif product.data_coupler > 0
     data = product.data_coupler
-    return "#{data} DATA Couplers"
-  else
-    return nil
+    "#{data} DATA Couplers"
   end
 end
 
@@ -212,15 +207,17 @@ def find_code(csv_row)
   model.join.to_i
 end
 
-def find_lead_l(csv_row) # 2500 5.0m 5m 0.8
-  model = csv_row.join.scan(/\b\d+\.\d\b|\b\d+\.\dm\b|\b\dm\b|\b\d{3,4}\b/i).join.downcase.chomp("m")
+# 2500 5.0m 5m 0.8
+def find_lead_l(csv_row)
+  model = csv_row.join.scan(/\b\d+\.\d\b|\b\d+\.\dm\b|\b\dm\b|\b\d{3,4}\b/i).join.downcase.chomp('m')
   # binding.pry
   lead = model.to_f
   puts "I found #{lead} lead lenght"
   lead > 99 ? lead / 1000.to_f : lead.to_f
 end
 
-def find_gpo(csv_row) # find number of AU_GPOS
+# find number of AU_GPOS
+def find_gpo(csv_row)
   model = csv_row.join.scan(/\d+G\b/)
   # > "14G".scan(/\d+|\D+/) ["14", "G"]
   gpos = model.join.scan(/\d+|\D+/)[0].to_i
@@ -228,34 +225,39 @@ def find_gpo(csv_row) # find number of AU_GPOS
   gpos
 end
 
-def find_tufr(csv_row) # find number of TUF-R
+# find number of TUF-R
+def find_tufr(csv_row)
   model = csv_row.join.scan(/\d+TUFR\b|TUFR\b/)
   tufrs = model.join.scan(/\d+|\D+/)[0].to_i
   puts "I found #{tufrs} TUF-R Sockets"
   tufrs
 end
 
-def find_tuf(csv_row) # find number of TUF
+# find number of TUF
+def find_tuf(csv_row)
   model = csv_row.join.scan(/\d+TUF\b/)
   tufs = model.join.scan(/\d+|\D+/)[0].to_i
   puts "I found #{tufs} TUF Sockets"
   tufs
 end
 
-def find_pd(csv_row)## need to find watts grep(/JC/).any?
+## need to find watts grep(/JC/).any?
+def find_pd(csv_row)
   model = csv_row.grep(/\bPD\b/).any?
   puts "I found PD = #{model}"
   model
 end
 
-def find_3_pin(csv_row)##
+##
+def find_3_pin(csv_row)
   model = csv_row.grep(/\b3pp|3PIN\b/i).any?
   puts "I found 3 PIN plug AU = #{model}"
   model
 end
 
-def find_3_pin_to(csv_row)##
-  model = csv_row.grep(/\b3pp&T\/O|3PT\/O\b/i).any?
+##
+def find_3_pin_to(csv_row)
+  model = csv_row.grep(%r{\b3pp&T/O|3PT/O\b}i).any?
   puts "I found 3 PIN Thermal OL AU = #{model}"
   model
 end
@@ -311,7 +313,8 @@ end
 
 ## DATA END ##
 
-def find_jc(csv_row) # find J Coupler
+# find J Coupler
+def find_jc(csv_row)
   model = csv_row.grep(/\bJC\b/).any?
   puts "I found JC = #{model}"
   model
@@ -341,4 +344,4 @@ end
 
 #### END SOCKETS PARTS ####
 
-dawn_csv('db/win_test.csv')
+dawn_csv('win_test.csv')
